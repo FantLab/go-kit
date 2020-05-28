@@ -8,13 +8,8 @@ type Result struct {
 	Error        error
 }
 
-type Rows interface {
-	Error() error
-	Scan(output interface{}) error
-}
-
 type Reader interface {
-	Read(ctx context.Context, q Query) Rows
+	Read(ctx context.Context, q Query, output interface{}) error
 }
 
 type Writer interface {

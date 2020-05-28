@@ -30,8 +30,8 @@ func (l logDB) Write(ctx context.Context, q Query) Result {
 	return logRW{rw: l.db, f: l.f}.Write(ctx, q)
 }
 
-func (l logDB) Read(ctx context.Context, q Query) Rows {
-	return logRW{rw: l.db, f: l.f}.Read(ctx, q)
+func (l logDB) Read(ctx context.Context, q Query, output interface{}) error {
+	return logRW{rw: l.db, f: l.f}.Read(ctx, q, output)
 }
 
 func (l logDB) InTransaction(perform func(ReaderWriter) error) error {
@@ -60,15 +60,15 @@ func (l logRW) Write(ctx context.Context, q Query) Result {
 	return result
 }
 
-func (l logRW) Read(ctx context.Context, q Query) Rows {
+func (l logRW) Read(ctx context.Context, q Query, output interface{}) error {
 	t := time.Now()
-	rows := l.rw.Read(ctx, q)
+	err := l.rw.Read(ctx, q, output)
 	l.f(ctx, LogEntry{
 		Query:    q.String,
 		Rows:     -1,
-		Err:      rows.Error(),
+		Err:      err,
 		Time:     t,
 		Duration: time.Since(t),
 	})
-	return rows
+	return err
 }

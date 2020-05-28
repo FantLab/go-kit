@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/FantLab/go-kit/database/rowscanner"
 	"github.com/FantLab/go-kit/database/sqlapi"
 )
 
@@ -25,8 +26,8 @@ func (db sqlDB) Write(ctx context.Context, q sqlapi.Query) sqlapi.Result {
 	return readerWriter{db.sql}.Write(ctx, q)
 }
 
-func (db sqlDB) Read(ctx context.Context, q sqlapi.Query) sqlapi.Rows {
-	return readerWriter{db.sql}.Read(ctx, q)
+func (db sqlDB) Read(ctx context.Context, q sqlapi.Query, output interface{}) error {
+	return readerWriter{db.sql}.Read(ctx, q, output)
 }
 
 // *******************************************************
@@ -60,14 +61,16 @@ func (rw readerWriter) Write(ctx context.Context, q sqlapi.Query) sqlapi.Result 
 	}
 }
 
-func (rw readerWriter) Read(ctx context.Context, q sqlapi.Query) sqlapi.Rows {
-	r, err := rw.sql.QueryContext(ctx, q.Text(), q.Args()...)
+func (rw readerWriter) Read(ctx context.Context, q sqlapi.Query, output interface{}) error {
+	rows, err := rw.sql.QueryContext(ctx, q.Text(), q.Args()...)
 
-	return sqlRows{
-		data:           r,
-		err:            err,
-		allowNullTypes: false,
+	if err != nil {
+		return err
 	}
+
+	defer rows.Close()
+
+	return rowscanner.Scan(output, sqlRows{data: rows})
 }
 
 // *******************************************************

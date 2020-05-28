@@ -11,20 +11,7 @@ import (
 // *******************************************************
 
 type sqlRows struct {
-	data           *sql.Rows
-	err            error
-	allowNullTypes bool
-}
-
-func (rows sqlRows) Error() error {
-	return rows.err
-}
-
-func (rows sqlRows) Scan(output interface{}) error {
-	if rows.err != nil {
-		return rows.err
-	}
-	return rowscanner.Scan(output, rows)
+	data *sql.Rows
 }
 
 func (rows sqlRows) AltNameTag() string {
@@ -32,10 +19,7 @@ func (rows sqlRows) AltNameTag() string {
 }
 
 func (rows sqlRows) IterateUsing(fn rowscanner.RowFunc) error {
-	if rows.err != nil {
-		return rows.err
-	}
-	return iterateOverRows(rows.data, rows.allowNullTypes, fn)
+	return iterateOverRows(rows.data, false, fn)
 }
 
 // *******************************************************
