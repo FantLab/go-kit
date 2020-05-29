@@ -43,8 +43,6 @@ func (column *sqlColumn) Get(value reflect.Value) reflect.Value {
 // *******************************************************
 
 func iterateOverRows(rows *sql.Rows, allowNullTypes bool, fn rowscanner.RowFunc) error {
-	defer rows.Close()
-
 	columnTypes, err := rows.ColumnTypes()
 
 	if err != nil {
