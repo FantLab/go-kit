@@ -22,11 +22,11 @@ func (db sqlDB) InTransaction(perform func(sqlapi.ReaderWriter) error) error {
 	})
 }
 
-func (db sqlDB) Write(ctx context.Context, q sqlapi.Query) sqlapi.Result {
+func (db sqlDB) Write(ctx context.Context, q *sqlapi.Query) sqlapi.Result {
 	return readerWriter{db.sql}.Write(ctx, q)
 }
 
-func (db sqlDB) Read(ctx context.Context, q sqlapi.Query, output interface{}) error {
+func (db sqlDB) Read(ctx context.Context, q *sqlapi.Query, output interface{}) error {
 	return readerWriter{db.sql}.Read(ctx, q, output)
 }
 
@@ -41,7 +41,7 @@ type readerWriter struct {
 	sql sqlReaderWriter
 }
 
-func (rw readerWriter) Write(ctx context.Context, q sqlapi.Query) sqlapi.Result {
+func (rw readerWriter) Write(ctx context.Context, q *sqlapi.Query) sqlapi.Result {
 	res, err := rw.sql.ExecContext(ctx, q.Text(), q.Args()...)
 
 	if err != nil {
@@ -61,7 +61,7 @@ func (rw readerWriter) Write(ctx context.Context, q sqlapi.Query) sqlapi.Result 
 	}
 }
 
-func (rw readerWriter) Read(ctx context.Context, q sqlapi.Query, output interface{}) error {
+func (rw readerWriter) Read(ctx context.Context, q *sqlapi.Query, output interface{}) error {
 	rows, err := rw.sql.QueryContext(ctx, q.Text(), q.Args()...)
 
 	if err != nil {

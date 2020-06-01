@@ -9,11 +9,11 @@ type Result struct {
 }
 
 type Reader interface {
-	Read(ctx context.Context, q Query, output interface{}) error
+	Read(ctx context.Context, q *Query, output interface{}) error
 }
 
 type Writer interface {
-	Write(ctx context.Context, q Query) Result
+	Write(ctx context.Context, q *Query) Result
 }
 
 type ReaderWriter interface {

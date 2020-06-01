@@ -26,11 +26,11 @@ type logDB struct {
 	f  LogFunc
 }
 
-func (l logDB) Write(ctx context.Context, q Query) Result {
+func (l logDB) Write(ctx context.Context, q *Query) Result {
 	return logRW{rw: l.db, f: l.f}.Write(ctx, q)
 }
 
-func (l logDB) Read(ctx context.Context, q Query, output interface{}) error {
+func (l logDB) Read(ctx context.Context, q *Query, output interface{}) error {
 	return logRW{rw: l.db, f: l.f}.Read(ctx, q, output)
 }
 
@@ -47,7 +47,7 @@ type logRW struct {
 	f  LogFunc
 }
 
-func (l logRW) Write(ctx context.Context, q Query) Result {
+func (l logRW) Write(ctx context.Context, q *Query) Result {
 	t := time.Now()
 	result := l.rw.Write(ctx, q)
 	l.f(ctx, LogEntry{
@@ -60,7 +60,7 @@ func (l logRW) Write(ctx context.Context, q Query) Result {
 	return result
 }
 
-func (l logRW) Read(ctx context.Context, q Query, output interface{}) error {
+func (l logRW) Read(ctx context.Context, q *Query, output interface{}) error {
 	t := time.Now()
 	err := l.rw.Read(ctx, q, output)
 	l.f(ctx, LogEntry{

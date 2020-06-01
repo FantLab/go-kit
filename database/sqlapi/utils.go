@@ -15,6 +15,12 @@ const (
 
 // *******************************************************
 
+func flatQuery(text string, args []interface{}) (string, []interface{}) {
+	newArgs, counts := flatArgs(args)
+	newText := expandQuery(text, BindVarChar, counts)
+	return newText, newArgs
+}
+
 func expandQuery(q string, bindVarChar rune, counts []int) string {
 	end := len(counts) - 1
 	cursor := 0
@@ -46,7 +52,7 @@ func expandQuery(q string, bindVarChar rune, counts []int) string {
 	return sb.String()
 }
 
-func flatArgs(args ...interface{}) ([]interface{}, []int) {
+func flatArgs(args []interface{}) ([]interface{}, []int) {
 	var flatSlice []interface{}
 
 	counts := make([]int, len(args))

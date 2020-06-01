@@ -9,8 +9,8 @@ import (
 	"github.com/FantLab/go-kit/env"
 )
 
-func InsertInto(tableName string, records ...interface{}) sqlapi.Query {
-	return *insertInto(tableName, "db", env.IsDebug(), records)
+func InsertInto(tableName string, records ...interface{}) *sqlapi.Query {
+	return insertInto(tableName, "db", env.IsDebug(), records)
 }
 
 func insertInto(tableName, tagName string, checkTypes bool, records []interface{}) *sqlapi.Query {
@@ -51,9 +51,7 @@ func insertInto(tableName, tagName string, checkTypes bool, records []interface{
 
 	text := makeInsertQueryText(tableName, fieldNames, sqlapi.BindVarChar, m)
 
-	query := sqlapi.NewQuery(text).WithArgs(args...)
-
-	return &query
+	return sqlapi.NewQuery(text).WithArgs(args...)
 }
 
 func extractFieldNames(typ reflect.Type, tagName string) (fieldNames []string) {

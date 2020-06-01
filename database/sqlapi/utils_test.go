@@ -102,3 +102,12 @@ func Test_formatQuery(t *testing.T) {
 		assert.True(t, x == "id = 1 and id in (2,3,4,5,6,7)")
 	})
 }
+
+func Test_flatQuery(t *testing.T) {
+	t.Run("positive", func(t *testing.T) {
+		text, args := flatQuery("? (?)", []interface{}{"s", []int{1, 2, 3}})
+
+		assert.True(t, text == "? (?,?,?)")
+		assert.DeepEqual(t, args, []interface{}{"s", 1, 2, 3})
+	})
+}

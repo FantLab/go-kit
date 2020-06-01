@@ -7,42 +7,33 @@ type Query struct {
 	args []interface{}
 }
 
-func NewQuery(text string) Query {
-	return Query{text: text}
+func NewQuery(text string) *Query {
+	return &Query{text: text}
 }
 
-func (q Query) Text() string {
+func (q *Query) Text() string {
 	return q.text
 }
 
-func (q Query) Args() []interface{} {
+func (q *Query) Args() []interface{} {
 	return q.args
 }
 
-func (q Query) WithArgs(args ...interface{}) Query {
-	return Query{
-		text: q.text,
-		args: args,
-	}
+func (q *Query) WithArgs(args ...interface{}) *Query {
+	q.args = args
+	return q
 }
 
-func (q Query) Inject(values ...interface{}) Query {
-	return Query{
-		text: fmt.Sprintf(q.text, values...),
-		args: q.args,
-	}
+func (q *Query) Inject(values ...interface{}) *Query {
+	q.text = fmt.Sprintf(q.text, values...)
+	return q
 }
 
-func (q Query) FlatArgs() Query {
-	newArgs, counts := flatArgs(q.args...)
-	newQuery := expandQuery(q.text, BindVarChar, counts)
-
-	return Query{
-		text: newQuery,
-		args: newArgs,
-	}
+func (q *Query) FlatArgs() *Query {
+	q.text, q.args = flatQuery(q.text, q.args)
+	return q
 }
 
-func (q Query) String() string {
+func (q *Query) String() string {
 	return formatQuery(q.text, BindVarChar, q.args...)
 }
